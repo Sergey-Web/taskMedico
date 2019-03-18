@@ -50,13 +50,13 @@ class UserProcedure implements IResponseProcedures
         $this->userService->checkAuthToken($id);
         $this->id = $id;
         $this->map($id);
-        $this->params = $this->userService->validParams($params);
+        $this->params = $params;
     }
 
     /**
      * @return array
      */
-    public function get(): array
+    public function get(): string
     {
         return (new $this->handler($this->params))->get($this->id);
     }

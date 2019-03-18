@@ -2,7 +2,6 @@
 
 namespace app\internalApi\models;
 
-use DateTime;
 use \RedBeanPHP\R as R;
 
 class User
@@ -38,11 +37,23 @@ class User
      */
     public function check(array $data): bool
     {
-        return (bool)R::getCell("
+        return (bool) R::getCell("
               SELECT id 
               FROM " . static::TABLE_NAME . "
               WHERE email = :email AND password = :pass",
             [':email' => $data['email'], ':pass' => $data['password']]
+        );
+    }
+
+    public function getPass(string $email)
+    {
+        return R::getAll("
+              SELECT password 
+              FROM " . static::TABLE_NAME . "
+              WHERE email = :email",
+            [
+                ':email' => $email
+            ]
         );
     }
 }

@@ -5,7 +5,7 @@ namespace app\internalApi\procedures\crud;
 use app\internalApi\models\{Token,User};
 use app\internalApi\services\{HttpService,UserService};
 
-class UserAdd
+class UserAdd implements IUser
 {
     const HTTP_METHOD = 'POST';
 
@@ -34,7 +34,7 @@ class UserAdd
      * @param array $params
      * @throws \Exception
      */
-    public function __construct(array $params)
+    public function __construct(string $params)
     {
         $this->httpService = new HttpService();
         $this->httpService->checkMethodHttp(static::HTTP_METHOD);
@@ -48,7 +48,7 @@ class UserAdd
      * @return array
      * @throws \Exception
      */
-    public function get(int $userId): array
+    public function get(int $userId): string
     {
         return (new UserService())->createUserTransaction($userId, $this->params);
     }

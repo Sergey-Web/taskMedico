@@ -34,7 +34,7 @@ class UserInfo implements IUser
      * @param array $params
      * @throws \Exception
      */
-    public function __construct(array $params)
+    public function __construct(string $params)
     {
         $this->httpService = new HttpService();
         $this->httpService->checkMethodHttp(static::HTTP_METHOD);

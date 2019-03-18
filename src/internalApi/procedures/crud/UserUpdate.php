@@ -34,7 +34,7 @@ class UserUpdate implements IUser
      * @param array $params
      * @throws \Exception
      */
-    public function __construct(array $params)
+    public function __construct(string $params)
     {
         $this->httpService = new HttpService();
         $this->httpService->checkMethodHttp(static::HTTP_METHOD);
@@ -45,10 +45,10 @@ class UserUpdate implements IUser
 
     /**
      * @param int $userId
-     * @return array
+     * @return string
      * @throws \Exception
      */
-    public function get(int $userId): array
+    public function get(int $userId): string
     {
         return (new UserService())->updateUserTransaction($userId, $this->params);
     }

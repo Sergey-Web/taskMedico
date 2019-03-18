@@ -45,7 +45,7 @@ class UserService
      */
     public function validParams(string $params): array
     {
-        return (json_decode($params) !== null) ? json_decode($params) : [];
+        return (json_decode($params, true) !== null) ? json_decode($params, true) : [];
     }
 
     /**
@@ -66,8 +66,9 @@ class UserService
     }
 
 
-    public function createUserTransaction(int $userId, array $params)
+    public function createUserTransaction(int $userId, string $params): string
     {
+        $params = $this->validParams($params);
         if (empty($params['email']) && empty($params['password'])) {
             throw new Exception('Error, mail or password is not entered');
         }
@@ -110,13 +111,18 @@ class UserService
         } catch (\Exception $e) {
             R::rollback();
         }
+
+        return 'create user';
     }
 
-    public function updateUserTransaction(int $userId, array $params)
+    public function updateUserTransaction(int $userId, string $params)
     {
+        $params = $this->validParams($params);
+        $this->checkDateForUpdate($params);
+
         R::begin();
         try {
-            if (empty($params['email']) && empty($params['password'])) {
+            if (!empty($params['email']) && !empty($params['password'])) {
                 $date = (new DateTime())->format('Y-m-d h:i:s');
                 $user = R::dispense('users');
                 $user->userId = $userId;
@@ -153,6 +159,22 @@ class UserService
         } catch (\Exception $e) {
             R::rollback();
         }
+
+        return 'update date';
+    }
+
+    private function checkDateForUpdate(array $params)
+    {
+        if (!empty($params['email'])
+            || !empty($params['password'])
+            || !empty($params['name'])
+            || !empty($params['access'])
+            || !empty($params['phone']))
+        {
+            return;
+        }
+
+        throw new Exception('Data not updated for update');
     }
 
 }
