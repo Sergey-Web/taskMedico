@@ -6,8 +6,7 @@ namespace app\internalApi\procedures;
 interface IResponseProcedures
 {
     /**
-     * @param array $dataUser
-     * @return string
+     * @return array
      */
-    function get(): string;
+    function get();
 }

@@ -12,7 +12,7 @@ class DataBaseConnect {
 
     public function getConnect(array $db)
     {
-        R::setup("mysql:{$db['host']};{$db['dbname']}", $db['user'], $db['pass']);
+        R::setup("mysql:host={$db['host']};dbname={$db['dbname']}", $db['user'], $db['pass']);
 
         if (!R::testConnection()) {
             throw new BadDBConnectionException();

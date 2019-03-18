@@ -4,33 +4,42 @@ namespace app\internalApi\services;
 
 use app\internalApi\exceptions\ProcedureIncorrectException;
 use app\internalApi\procedures\IResponseProcedures;
-use app\internalApi\procedures\Login;
+use app\internalApi\procedures\LoginProcedure;
+use app\internalApi\procedures\UserProcedure;
 
 class HandlerRequest implements IHandlerRequest
 {
     const PAGES_ACCESS = [
-        'api/login' => Login::class,
-        'api/user',
-        'api/task',
+        'login' => LoginProcedure::class,
+        'user' => UserProcedure::class,
+//        'task' => Task::class,
     ];
 
-    private $page;
+    /**
+     * @var IResponseProcedures
+     */
+    private $procedure;
 
-    private $handler;
+    /**
+     * @var int
+     */
+    private $id;
+
+    /**
+     * @var string
+     */
+    private $params;
 
     /**
      * HandlerRequest constructor.
-     * @param $page
+     * @param string $page
+     * @param string $params
      * @throws ProcedureIncorrectException
      */
-    public function __construct($page)
+    public function __construct(string $page, string $params)
     {
-        $this->rawPageFormatting($page);
-        if (array_key_exists($this->page, static::PAGES_ACCESS) === false) {
-            throw new ProcedureIncorrectException();
-        }
-
-        $this->handler = static::PAGES_ACCESS[$this->page];
+        $this->processingRequest($page);
+        $this->params = $params;
     }
 
     /**
@@ -38,14 +47,35 @@ class HandlerRequest implements IHandlerRequest
      */
     public function getHandler(): IResponseProcedures
     {
-        return new $this->handler;
+        return new $this->procedure($this->id, $this->params);
     }
 
     /**
      * @param $page
+     * @throws ProcedureIncorrectException
      */
-    private function rawPageFormatting($page)
+    private function processingRequest($page)
     {
-        $this->page = mb_strtolower(trim($page, '/'));
+        $procedure = $this->getProcedure($page);
+        $this->procedure = static::PAGES_ACCESS[$procedure[1]];
+        $this->id = !empty($procedure[2]) ? (int) $procedure[2] : 0;
+    }
+
+    /**
+     * @param $page
+     * @return mixed
+     * @throws ProcedureIncorrectException
+     */
+    private function getProcedure($page)
+    {
+        $page = mb_strtolower(trim($page, '/'));
+        preg_match('/^api\/(\w+)\/?(\d+)?/', $page, $matches);
+
+        if (empty($matches[1])
+            || array_key_exists($matches[1], static::PAGES_ACCESS) === false) {
+            throw new ProcedureIncorrectException();
+        }
+
+        return $matches;
     }
 }

@@ -1,11 +1,8 @@
 <?php
 
-use app\internalApi\procedures\Login;
-
 const DB = [
     'host' => 'localhost',
-    'dbname' => 'medic',
-    'domain' => 'localhost',
+    'dbname' => 'medico',
     'user' => 'root',
     'pass' => 'admin'
 ];
