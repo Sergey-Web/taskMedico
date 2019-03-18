@@ -45,8 +45,13 @@ CREATE TABLE `tokens`
   FOREIGN KEY (`user_id`) REFERENCES users (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB;
 
-CREATE INDEX users_email_pass ON users (email, password);
+# Для успешной аунтентификации нужно поиск будет по email
+CREATE INDEX users_email_pass ON users (email);
+# При проверки прав пользователей проверка будет по полю access
 CREATE INDEX accesses_access ON accesses (access);
+# Под вопросом я не знаю как это API бы использовалось
 CREATE INDEX phones_phone ON phones (phone);
+# Так же под вопросом
 CREATE INDEX names_name ON names (name);
+# Обновление токена будет постостоянно происходить по этому 2 поля будут постоянно присутсвовать в выборке
 CREATE INDEX tokens_user_id_date ON tokens (user_id, date);
