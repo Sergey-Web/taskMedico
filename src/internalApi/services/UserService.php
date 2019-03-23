@@ -2,42 +2,18 @@
 
 namespace app\internalApi\services;
 
-use app\internalApi\models\{Token,User};
+use app\internalApi\models\{Access, Token};
 use DateTime;
 use Exception;
 use \RedBeanPHP\R as R;
 
 class UserService
 {
-    /**
-     * @var User
-     */
-    private $user;
-
-    /**
-     * @var Token
-     */
-    private $token;
-
-    /**
-     * @var string
-     */
-    private $authToken;
-
-    /**
-     * @var HttpService
-     */
-    private $httpService;
-    /**
-     * UserService constructor.
-     * @throws Exception
-     */
-    public function __construct()
-    {
-        $this->httpService = new HttpService();
-        $this->user = new User();
-        $this->token = new Token();
-    }
+    private $accesses = [
+        'inactive',
+        'user',
+        'admin'
+    ];
 
     /**
      * @param string $params
@@ -49,23 +25,25 @@ class UserService
     }
 
     /**
-     * @param int $userId
      * @return mixed
      * @throws Exception
      */
-    public function checkAuthToken(int $userId)
+    public function checkAuthToken()
     {
-        $this->authToken = $this->httpService->getHeaderAuthToken();
-        $userToken = $this->token->get($userId)[0]['token'];
+        $authToken = (new HttpService())->getHeaderAuthToken();
+        $userToken = (new Token())->getUserIdByToken($authToken);
 
-        if ($userToken !== $this->authToken) {
+        if (!$userToken) {
             throw new Exception('Authentication Key Error');
         }
-
-        return $this->token->get($userId)[0];
     }
 
-
+    /**
+     * @param int $userId
+     * @param string $params
+     * @return string
+     * @throws Exception
+     */
     public function createUserTransaction(int $userId, string $params): string
     {
         $params = $this->validParams($params);
@@ -99,13 +77,13 @@ class UserService
             }
 
             if (!empty($params['phone'])) {
-                $phone = R::dispense('names');
+                $phone = R::dispense('phones');
                 $phone->user_id = $userId;
-                $phone->name = $params['phone'];
+                $phone->phone = $params['phone'];
                 R::store($phone);
             }
 
-            $this->token->createToken($userId);
+            (new Token())->createToken($userId, (new TokenService)->generation());
 
             R::commit();
         } catch (\Exception $e) {
@@ -115,6 +93,12 @@ class UserService
         return 'create user';
     }
 
+    /**
+     * @param int $userId
+     * @param string $params
+     * @return string
+     * @throws Exception
+     */
     public function updateUserTransaction(int $userId, string $params)
     {
         $params = $this->validParams($params);
@@ -122,14 +106,16 @@ class UserService
 
         R::begin();
         try {
-            if (!empty($params['email']) && !empty($params['password'])) {
-                $date = (new DateTime())->format('Y-m-d h:i:s');
-                $user = R::dispense('users');
-                $user->userId = $userId;
+
+            $user = R::dispense('users');
+            $user->id = $userId;
+
+            if (!empty($params['email'])) {
                 $user->email = $params['email'];
+            }
+
+            if (!empty($params['password'])) {
                 $user->password = password_hash($params['password'], PASSWORD_BCRYPT);
-                $user->update_at = $date;
-                R::store($user);
             }
 
             if (!empty($params['access'])) {
@@ -142,27 +128,45 @@ class UserService
             if (!empty($params['name'])) {
                 $name = R::dispense('names');
                 $name->user_id = $userId;
-                $name->name = empty($params['name']) ? $params['name'] : null;
+                $name->name = $params['name'];
                 R::store($name);
             }
 
             if (!empty($params['phone'])) {
-                $phone = R::dispense('names');
+                $phone = R::dispense('phones');
                 $phone->user_id = $userId;
-                $phone->name = $params['phone'];
+                $phone->phone = $params['phone'];
                 R::store($phone);
             }
 
-            $this->token->updateToken($userId);
+            R::store($user);
 
             R::commit();
         } catch (\Exception $e) {
             R::rollback();
+            throw new Exception('Data not updated');
         }
 
         return 'update date';
     }
 
+    /**
+     * @throws Exception
+     */
+    public function checkAccessAdmin()
+    {
+        $token = (new HttpService)->getHeaderAuthToken();
+        $userAccess = (new Access)->getAccessUserByToken($token);
+
+        if ($this->accesses[$userAccess] !== 'admin') {
+            throw new Exception('You do not have edit access');
+        }
+    }
+
+    /**
+     * @param array $params
+     * @throws Exception
+     */
     private function checkDateForUpdate(array $params)
     {
         if (!empty($params['email'])

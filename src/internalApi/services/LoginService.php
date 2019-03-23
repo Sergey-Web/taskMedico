@@ -12,6 +12,11 @@ class LoginService
      */
     private $user;
 
+    /**
+     * @var array
+     */
+    private $params;
+
     public function __construct()
     {
         $this->user = new User();
@@ -19,43 +24,43 @@ class LoginService
 
     /**
      * @param string $params
-     * @return bool
+     * @return int
      * @throws Exception
      */
-    public function checkUser(string $params): bool
+    public function checkUser(string $params): int
     {
+        $params = json_decode($params, true);
         $this->checkParamsUser($params);
+        $this->checkPass($params);
 
-        $userId = $this->checkPass();
-
-        if (!$userId) {
-            throw new Exception('Authentication data is not transferred or transferred incorrectly');
-        }
-
-        return $userId;
+        return $this->user->getUserId($params['email']);
     }
 
     /**
-     * @param string $params
+     * @param array $params
      * @throws Exception
      */
-    private function checkParamsUser(string $params)
+    private function checkParamsUser(array $params)
     {
-        $params = json_decode($params, true);
-
         if (empty($params)) {
             throw new Exception('Authentication data is not transferred or transferred incorrectly');
         }
 
-        if (empty($params['email']) && empty($params['pass'])) {
+        if (empty($params['email']) && empty($params['password'])) {
             throw new Exception('Error, mail or password is not entered');
         }
     }
 
-    private function checkPass(array $params): bool
+    /**
+     * @param array $params
+     * @throws Exception
+     */
+    private function checkPass(array $params)
     {
         $passHash = $this->user->getPass($params['email']);
 
-        return password_verify($params['pass'], $passHash);
+        if (password_verify($this->params['password'], $passHash)) {
+            throw new Exception('Error, mail or password is not entered');
+        }
     }
 }

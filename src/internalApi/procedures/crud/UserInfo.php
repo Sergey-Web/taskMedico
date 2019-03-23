@@ -31,7 +31,7 @@ class UserInfo implements IUser
 
     /**
      * UserInfo constructor.
-     * @param array $params
+     * @param string $params
      * @throws \Exception
      */
     public function __construct(string $params)
@@ -47,8 +47,9 @@ class UserInfo implements IUser
      * @param int $userId
      * @return array
      */
-    public function get(int $userId): array
+    public function get(int $userId)
     {
-        return $this->user->get($userId, $this->params);
+
+        return $this->user->get($userId, $this->params)[0];
     }
 }

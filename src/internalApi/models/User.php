@@ -23,7 +23,7 @@ class User
               SELECT u.email, u.created_at, n.name, p.phone 
               FROM " . static::TABLE_NAME . " AS u 
               LEFT JOIN names AS n ON u.id = n.user_id 
-              LEFT JOIN phones AS p ON u.id = n.user_id 
+              LEFT JOIN phones AS p ON u.id = p.user_id 
               WHERE u.id = :id",
             [
                 ':id' => $userId
@@ -32,22 +32,26 @@ class User
     }
 
     /**
-     * @param array $data
-     * @return bool
+     * @param string $email
+     * @return int
      */
-    public function check(array $data): bool
+    public function getUserId(string $email): int
     {
-        return (bool) R::getCell("
+        return (int) R::getCell("
               SELECT id 
               FROM " . static::TABLE_NAME . "
-              WHERE email = :email AND password = :pass",
-            [':email' => $data['email'], ':pass' => $data['password']]
+              WHERE email = :email",
+            [':email' => $email]
         );
     }
 
-    public function getPass(string $email)
+    /**
+     * @param string $email
+     * @return string
+     */
+    public function getPass(string $email): string
     {
-        return R::getAll("
+        return R::getCell("
               SELECT password 
               FROM " . static::TABLE_NAME . "
               WHERE email = :email",

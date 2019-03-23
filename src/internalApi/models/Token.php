@@ -4,12 +4,21 @@ namespace app\internalApi\models;
 
 use app\internalApi\exceptions\TokenUpdateErrorExceptions;
 use app\internalApi\services\TokenService;
-use DateTime;
 use \RedBeanPHP\R as R;
 
 class Token {
 
     const TABLE_NAME = 'tokens';
+
+    public function getUserIdByToken(string $userToken): string
+    {
+        return R::getCell("
+              SELECT user_id 
+              FROM " . static::TABLE_NAME . "
+              WHERE token = :token",
+            [':token' => $userToken]
+        );
+    }
 
     /**
      * @param int $userId
@@ -27,12 +36,12 @@ class Token {
 
     /**
      * @param int $userId
+     * @param string $tokenGenerate
      * @return string
      * @throws TokenUpdateErrorExceptions
      */
-    public function createToken(int $userId): string
+    public function createToken(int $userId, string $tokenGenerate): string
     {
-        $tokenGenerate = (new TokenService)->generation();
         $token = R::dispense(static::TABLE_NAME);
         $token->user_id = $userId;
         $token->token = $tokenGenerate;
@@ -46,23 +55,25 @@ class Token {
 
     /**
      * @param int $userId
+     * @param string $token
      * @return string
      * @throws TokenUpdateErrorExceptions
      */
-    public function updateToken(int $userId): string
+    public function updateToken(int $userId, string $token): string
     {
-        $tokenGenerate = (new TokenService)->generation();
-
         $tokenUpdate = R::exec( "
                           UPDATE ".static::TABLE_NAME."  
-                          SET user_id = {$userId}, token ='{$tokenGenerate}'
-                        ");
+                          SET user_id = :user_id, token = '{$token}'",
+                            [
+                                ':user_id' => $userId
+                            ]
+                        );
 
         if (!$tokenUpdate) {
             throw new TokenUpdateErrorExceptions();
         }
 
-        return $tokenGenerate;
+        return $token;
     }
 
     /**
@@ -72,11 +83,13 @@ class Token {
      */
     public function updateDate(int $userId): bool
     {
-        $date = (new DateTime())->format('Y-m-d h:i:s');
         $tokenUpdate = R::exec( "
                           UPDATE ".static::TABLE_NAME."  
-                          SET user_id = {$userId}, date = '{$date}'
-                        ");
+                          SET user_id = :user_id'",
+                            [
+                                'user_id' => $userId
+                            ]
+                        );
 
         if (!$tokenUpdate) {
             throw new TokenUpdateErrorExceptions();

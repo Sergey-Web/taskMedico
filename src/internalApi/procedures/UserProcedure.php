@@ -47,7 +47,7 @@ class UserProcedure implements IResponseProcedures
     public function __construct(int $id, string $params)
     {
         $this->userService = new UserService();
-        $this->userService->checkAuthToken($id);
+        $this->userService->checkAuthToken();
         $this->id = $id;
         $this->map($id);
         $this->params = $params;
@@ -56,7 +56,7 @@ class UserProcedure implements IResponseProcedures
     /**
      * @return array
      */
-    public function get(): string
+    public function get(): array
     {
         return (new $this->handler($this->params))->get($this->id);
     }

@@ -4,6 +4,7 @@ namespace app\internalApi\procedures;
 
 use app\internalApi\models\Token;
 use app\internalApi\services\LoginService;
+use app\internalApi\services\TokenService;
 
 class LoginProcedure implements IResponseProcedures
 {
@@ -47,6 +48,6 @@ class LoginProcedure implements IResponseProcedures
     {
         $userId = $this->loginService->checkUser($this->params);
 
-        return $this->token->updateDate($userId);
+        return $this->token->updateToken($userId, (new TokenService)->generation());
     }
 }

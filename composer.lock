@@ -4,7 +4,6 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "4441c10212463732bc3d204736e2820d",
     "content-hash": "d380c81c918213076a939594f375ab9c",
     "packages": [
         {
@@ -46,7 +45,7 @@
             "keywords": [
                 "orm"
             ],
-            "time": "2018-10-26 09:06:03"
+            "time": "2018-10-26T09:06:03+00:00"
         }
     ],
     "packages-dev": [],
