@@ -8,21 +8,6 @@ use Exception;
 class LoginService
 {
     /**
-     * @var User
-     */
-    private $user;
-
-    /**
-     * @var array
-     */
-    private $params;
-
-    public function __construct()
-    {
-        $this->user = new User();
-    }
-
-    /**
      * @param string $params
      * @return int
      * @throws Exception
@@ -33,7 +18,7 @@ class LoginService
         $this->checkParamsUser($params);
         $this->checkPass($params);
 
-        return $this->user->getUserId($params['email']);
+        return (new User())->getUserId($params['email']);
     }
 
     /**
@@ -57,9 +42,9 @@ class LoginService
      */
     private function checkPass(array $params)
     {
-        $passHash = $this->user->getPass($params['email']);
+        $passHash = (new User())->getPass($params['email']);
 
-        if (password_verify($this->params['password'], $passHash)) {
+        if (!password_verify($params['password'], $passHash)) {
             throw new Exception('Error, mail or password is not entered');
         }
     }

@@ -3,15 +3,11 @@
 namespace app\internalApi\procedures;
 
 use app\internalApi\models\Token;
-use app\internalApi\services\LoginService;
-use app\internalApi\services\TokenService;
+use app\internalApi\services\{HttpService, LoginService, TokenService};
 
 class LoginProcedure implements IResponseProcedures
 {
-    /**
-     * @var Token
-     */
-    private $token;
+    const METHOD_HTTP = 'POST';
 
     /**
      * @var string
@@ -19,24 +15,14 @@ class LoginProcedure implements IResponseProcedures
     private $params;
 
     /**
-     * @var LoginService
-     */
-    private $loginService;
-
-    /**
-     * @var int
-     */
-    private $id;
-
-    /**
-     * Login constructor.
+     * LoginProcedure constructor.
      * @param int $id
      * @param string $params
+     * @throws \Exception
      */
     public function __construct(int $id, string $params)
     {
-        $this->token = new Token();
-        $this->loginService = new LoginService();
+        (new HttpService)->checkMethodHttp(static::METHOD_HTTP);
         $this->params = $params;
     }
 
@@ -46,8 +32,8 @@ class LoginProcedure implements IResponseProcedures
      */
     public function get(): string
     {
-        $userId = $this->loginService->checkUser($this->params);
+        $userId = (new LoginService())->checkUser($this->params);
 
-        return $this->token->updateToken($userId, (new TokenService)->generation());
+        return (new Token())->updateToken($userId, (new TokenService)->generation());
     }
 }
