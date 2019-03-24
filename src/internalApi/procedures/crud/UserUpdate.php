@@ -14,7 +14,6 @@ class UserUpdate implements IUser
      */
     private $params;
 
-
     /**
      * @var UserService
      */
@@ -35,13 +34,13 @@ class UserUpdate implements IUser
 
     /**
      * @param int $userId
-     * @return string
+     * @return array
      * @throws \Exception
      */
     public function get(int $userId): array
     {
         $this->userService->updateUserTransaction($userId, $this->params);
-var_dump((new User)->get($userId));die;
-        //return;
+
+        return (new User)->get($userId)[0];
     }
 }

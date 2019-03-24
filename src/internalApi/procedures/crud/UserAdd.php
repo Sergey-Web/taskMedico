@@ -10,36 +10,26 @@ class UserAdd implements IUser
     const HTTP_METHOD = 'POST';
 
     /**
-     * @var User
-     */
-    private $user;
-
-    /**
-     * @var Token
-     */
-    private $token;
-
-    /**
      * @var string
      */
     private $params;
 
     /**
-     * @var HttpService
+     * @var UserService
      */
-    private $httpService;
+    private $userService;
+
 
     /**
      * UserInfo constructor.
-     * @param array $params
+     * @param string $params
      * @throws \Exception
      */
     public function __construct(string $params)
     {
-        $this->httpService = new HttpService();
-        $this->httpService->checkMethodHttp(static::HTTP_METHOD);
-        $this->user = new User();
-        $this->token = new Token();
+        $this->userService = new UserService();
+        (new HttpService())->checkMethodHttp(static::HTTP_METHOD);
+        $this->userService->checkAccessAdmin();
         $this->params = $params;
     }
 
@@ -48,8 +38,10 @@ class UserAdd implements IUser
      * @return array
      * @throws \Exception
      */
-    public function get(int $userId): string
+    public function get(int $userId): array
     {
-        return (new UserService())->createUserTransaction($userId, $this->params);
+        $userCreateId = (new UserService())->createUserTransaction($this->params);
+
+        return (new User)->get($userCreateId)[0];
     }
 }

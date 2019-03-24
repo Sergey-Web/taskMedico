@@ -6,5 +6,5 @@ interface IUser
 {
     function __construct(string $params);
 
-    function get(int $userId);
+    function get(int $userId): array;
 }
