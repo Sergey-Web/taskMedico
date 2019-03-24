@@ -1,6 +1,6 @@
 <?php
 
-namespace app\internalApi\procedures\crud;
+namespace app\internalApi\procedures\user;
 
 interface IUser
 {

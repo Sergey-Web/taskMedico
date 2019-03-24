@@ -2,8 +2,7 @@
 
 namespace app\internalApi\models;
 
-use app\internalApi\exceptions\TokenUpdateErrorExceptions;
-use app\internalApi\services\TokenService;
+use app\internalApi\exceptions\{TokenCreateErrorExceptions,TokenUpdateErrorExceptions};
 use \RedBeanPHP\R as R;
 
 class Token {
@@ -20,9 +19,19 @@ class Token {
         );
     }
 
+    public function getDateToken(string $token): string
+    {
+        return R::getCell("
+              SELECT date
+              FROM " . static::TABLE_NAME . "
+              WHERE token = :token",
+            [':token' => $token]
+        );
+    }
+
     /**
      * @param int $userId
-     * @return string
+     * @return array
      */
     public function get(int $userId)
     {
@@ -38,7 +47,7 @@ class Token {
      * @param int $userId
      * @param string $tokenGenerate
      * @return string
-     * @throws TokenUpdateErrorExceptions
+     * @throws TokenCreateErrorExceptions
      */
     public function createToken(int $userId, string $tokenGenerate): string
     {
@@ -47,7 +56,7 @@ class Token {
         $token->token = $tokenGenerate;
 
         if (!R::store($token)) {
-            throw new TokenUpdateErrorExceptions();
+            throw new TokenCreateErrorExceptions();
         }
 
         return $tokenGenerate;
@@ -62,8 +71,9 @@ class Token {
     public function updateToken(int $userId, string $token): string
     {
         $tokenUpdate = R::exec( "
-                          UPDATE ".static::TABLE_NAME."  
-                          SET user_id = :user_id, token = '{$token}'",
+                          UPDATE " . static::TABLE_NAME . "  
+                          SET token = '{$token}', date = NOW() 
+                          WHERE user_id = :user_id",
                             [
                                 ':user_id' => $userId
                             ]
@@ -84,8 +94,8 @@ class Token {
     public function updateDate(int $userId): bool
     {
         $tokenUpdate = R::exec( "
-                          UPDATE ".static::TABLE_NAME."  
-                          SET user_id = :user_id'",
+                          UPDATE " . static::TABLE_NAME . "  
+                          SET date = NOW() WHERE user_id = :user_id",
                             [
                                 'user_id' => $userId
                             ]

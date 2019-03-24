@@ -2,8 +2,10 @@
 
 namespace app\internalApi\procedures;
 
+use app\internalApi\exceptions\TokenUpdateErrorExceptions;
 use app\internalApi\models\Token;
 use app\internalApi\services\{HttpService, LoginService, TokenService};
+use Exception;
 
 class LoginProcedure implements IResponseProcedures
 {
@@ -18,7 +20,7 @@ class LoginProcedure implements IResponseProcedures
      * LoginProcedure constructor.
      * @param int $id
      * @param string $params
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct(int $id, string $params)
     {
@@ -28,7 +30,7 @@ class LoginProcedure implements IResponseProcedures
 
     /**
      * @return string
-     * @throws \app\internalApi\exceptions\TokenUpdateErrorExceptions
+     * @throws TokenUpdateErrorExceptions
      */
     public function get(): string
     {

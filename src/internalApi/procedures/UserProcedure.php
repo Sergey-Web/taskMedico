@@ -2,12 +2,8 @@
 
 namespace app\internalApi\procedures;
 
-
-use app\internalApi\procedures\crud\UserAdd;
-use app\internalApi\procedures\crud\UserInfo;
-use app\internalApi\procedures\crud\UserUpdate;
-use app\internalApi\services\HttpService;
-use app\internalApi\services\UserService;
+use app\internalApi\procedures\user\{UserAdd, UserInfo, UserUpdate};
+use app\internalApi\services\{HttpService, TokenService};
 use Exception;
 
 class UserProcedure implements IResponseProcedures
@@ -34,20 +30,15 @@ class UserProcedure implements IResponseProcedures
     private $handler;
 
     /**
-     * @var UserService
-     */
-    private $userService;
-
-    /**
      * UserProcedure constructor.
      * @param int $id
      * @param string $params
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct(int $id, string $params)
     {
-        $this->userService = new UserService();
-        $this->userService->checkAuthToken();
+        (new TokenService)->checkToken();
+        (new TokenService)->updateDateTimeToken();
         $this->id = $id;
         $this->map($id);
         $this->params = $params;

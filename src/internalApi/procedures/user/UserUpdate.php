@@ -1,9 +1,9 @@
 <?php
 
-namespace app\internalApi\procedures\crud;
+namespace app\internalApi\procedures\user;
 
 use app\internalApi\models\{Access, Token, User};
-use app\internalApi\services\{HttpService, UserService};
+use app\internalApi\services\{HttpService, TokenService, UserService};
 
 class UserUpdate implements IUser
 {
@@ -39,6 +39,7 @@ class UserUpdate implements IUser
      */
     public function get(int $userId): array
     {
+        $userId = (new TokenService())->getUserIdByAuthToken();
         $this->userService->updateUserTransaction($userId, $this->params);
 
         return (new User)->get($userId)[0];

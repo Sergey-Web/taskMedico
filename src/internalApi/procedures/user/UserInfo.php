@@ -1,9 +1,10 @@
 <?php
 
-namespace app\internalApi\procedures\crud;
+namespace app\internalApi\procedures\user;
 
-use app\internalApi\models\{Token,User};
+use app\internalApi\models\User;
 use app\internalApi\services\HttpService;
+use Exception;
 
 class UserInfo implements IUser
 {
@@ -16,7 +17,8 @@ class UserInfo implements IUser
 
     /**
      * UserInfo constructor.
-     * @throws \Exception
+     * @param string $params
+     * @throws Exception
      */
     public function __construct(string $params)
     {
@@ -27,9 +29,16 @@ class UserInfo implements IUser
     /**
      * @param int $userId
      * @return array
+     * @throws Exception
      */
     public function get(int $userId): array
     {
-        return (new User)->get($userId)[0];
+        $dataUser = (new User)->get($userId);
+
+        if (empty($dataUser[0])) {
+            throw new Exception('User with this ID was not found in the database', 403);
+        }
+
+        return $dataUser[0];
     }
 }

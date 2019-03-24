@@ -17,8 +17,9 @@ class LoginService
         $params = json_decode($params, true);
         $this->checkParamsUser($params);
         $this->checkPass($params);
+        $dataUser = (new User())->getUserId($params['email']);
 
-        return (new User())->getUserId($params['email']);
+        return $dataUser;
     }
 
     /**
@@ -28,11 +29,11 @@ class LoginService
     private function checkParamsUser(array $params)
     {
         if (empty($params)) {
-            throw new Exception('Authentication data is not transferred or transferred incorrectly');
+            throw new Exception('Authentication data is not transferred or transferred incorrectly', 401);
         }
 
         if (empty($params['email']) && empty($params['password'])) {
-            throw new Exception('Error, mail or password is not entered');
+            throw new Exception('Error, mail or password is not entered', 401);
         }
     }
 

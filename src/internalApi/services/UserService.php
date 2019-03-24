@@ -25,20 +25,6 @@ class UserService
     }
 
     /**
-     * @return mixed
-     * @throws Exception
-     */
-    public function checkAuthToken()
-    {
-        $authToken = (new HttpService())->getHeaderAuthToken();
-        $userToken = (new Token())->getUserIdByToken($authToken);
-
-        if (!$userToken) {
-            throw new Exception('Authentication Key Error');
-        }
-    }
-
-    /**
      * @param string $params
      * @return string
      * @throws Exception
@@ -46,7 +32,7 @@ class UserService
     public function createUserTransaction(string $params): string
     {
         $params = $this->validParams($params);
-        if (empty($params['email']) && empty($params['password'])) {
+        if (empty($params['email']) || empty($params['password'])) {
             throw new Exception('Error, mail or password is not entered');
         }
 
@@ -150,7 +136,7 @@ class UserService
         $userAccess = (new Access)->getAccessUserByToken($token);
 
         if ($this->accesses[$userAccess] !== 'admin') {
-            throw new Exception('You do not have access');
+            throw new Exception('You do not have access', 403);
         }
     }
 

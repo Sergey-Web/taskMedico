@@ -7,6 +7,7 @@ ini_set('display_startup_errors', 1);
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/src/config.php';
 
+use const app\config\DB;
 use app\db\DataBaseConnect;
 use app\internalApi\services\HandlerRequest;
 use app\internalApi\services\HandlerResponse;

@@ -4,15 +4,14 @@ namespace app\internalApi\services;
 
 use app\internalApi\exceptions\ProcedureIncorrectException;
 use app\internalApi\procedures\IResponseProcedures;
-use app\internalApi\procedures\LoginProcedure;
-use app\internalApi\procedures\UserProcedure;
+use app\internalApi\procedures\{LoginProcedure, TaskProcedure, UserProcedure};
 
 class HandlerRequest implements IHandlerRequest
 {
-    const PAGES_ACCESS = [
+    private $pagesAccess = [
         'login' => LoginProcedure::class,
         'user' => UserProcedure::class,
-//        'task' => Task::class,
+        'task' => TaskProcedure::class,
     ];
 
     /**
@@ -57,7 +56,7 @@ class HandlerRequest implements IHandlerRequest
     private function processingRequest($page)
     {
         $procedure = $this->getProcedure($page);
-        $this->procedure = static::PAGES_ACCESS[$procedure[1]];
+        $this->procedure = $this->pagesAccess[$procedure[1]];
         $this->id = !empty($procedure[2]) ? (int) $procedure[2] : 0;
     }
 
@@ -72,7 +71,7 @@ class HandlerRequest implements IHandlerRequest
         preg_match('/^api\/(\w+)\/?(\d+)?/', $page, $matches);
 
         if (empty($matches[1])
-            || array_key_exists($matches[1], static::PAGES_ACCESS) === false) {
+            || array_key_exists($matches[1], $this->pagesAccess) === false) {
             throw new ProcedureIncorrectException();
         }
 
