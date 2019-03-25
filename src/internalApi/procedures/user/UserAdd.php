@@ -19,7 +19,6 @@ class UserAdd implements IUser
      */
     private $userService;
 
-
     /**
      * UserInfo constructor.
      * @param string $params
@@ -40,8 +39,8 @@ class UserAdd implements IUser
      */
     public function get(int $userId): array
     {
-        $userCreateId = (new UserService())->createUserTransaction($this->params);
-
+        $userCreateId = $this->serService()->createUserTransaction($this->params);
+        
         return (new User)->get($userCreateId)[0];
     }
 }
