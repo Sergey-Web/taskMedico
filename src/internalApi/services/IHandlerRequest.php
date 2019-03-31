@@ -12,9 +12,4 @@ interface IHandlerRequest
      * @param string $params
      */
     function __construct(string $page, string $params);
-
-    /**
-     * @return IResponseProcedures
-     */
-    function getHandler(): IResponseProcedures;
 }

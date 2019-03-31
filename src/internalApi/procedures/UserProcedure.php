@@ -44,10 +44,15 @@ class UserProcedure implements IResponseProcedures
         $this->params = $params;
     }
 
+    public function get()
+    {
+        echo json_encode(['result' => $this->handler()]);
+    }
+
     /**
      * @return array
      */
-    public function get(): array
+    public function handler(): array
     {
         return (new $this->handler($this->params))->get($this->id);
     }
@@ -55,7 +60,7 @@ class UserProcedure implements IResponseProcedures
     /**
      * @throws Exception
      */
-    public function map()
+    private function map()
     {
         $method = (new HttpService)->getHttpMethod();
 

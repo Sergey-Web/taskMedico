@@ -20,9 +20,9 @@ class TokenService
         $curDate = (new DateTime());
         $dateDiff = $curDate->getTimestamp() - $tokenData->getTimestamp();
 
-//        if ($dateDiff > TIME_TOKEN) {
-//            throw new Exception('Your token is out of date');
-//        }
+        if ($dateDiff > TIME_TOKEN) {
+            throw new Exception('Your token is out of date');
+        }
 
     }
 
@@ -64,13 +64,13 @@ class TokenService
     }
 
     /**
-     * @return string
+     * @return int
      * @throws Exception
      */
-    public function getUserIdByAuthToken(): string
+    public function getUserIdByAuthToken(): int
     {
         $authToken = (new HttpService())->getHeaderAuthToken();
-        $userId = (new Token())->getUserIdByToken($authToken);
+        $userId = (int) (new Token())->getUserIdByToken($authToken);
 
         if (!$userId) {
             throw new Exception('Authentication Key Error');

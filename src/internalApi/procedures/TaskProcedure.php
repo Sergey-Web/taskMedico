@@ -3,14 +3,16 @@
 namespace app\internalApi\procedures;
 
 use app\internalApi\services\{HttpService, TokenService};
-use app\internalApi\procedures\task\{StartTask, ResultTask};
+use app\internalApi\procedures\task\{StartTask, ResultTask, ProcessingTask};
 use Exception;
 
 class TaskProcedure implements IResponseProcedures
 {
-    const MAP_METHOD = [
+
+    private $methodsMap = [
         'POST' => StartTask::class,
-        'GET' => ResultTask::class
+        'GET' => ResultTask::class,
+        'PUT' => ProcessingTask::class
     ];
 
     /**
@@ -43,23 +45,23 @@ class TaskProcedure implements IResponseProcedures
         $this->params = $params;
     }
 
-    /**
-     * @return string
-     */
-    public function get(): string
+
+    public function get()
     {
-        return (new $this->handler($this->params))->get($this->id);
+        (new $this->handler($this->params))->get($this->id);
     }
 
-
-    public function map()
+    /**
+     * @throws Exception
+     */
+    private function map()
     {
         $method = (new HttpService)->getHttpMethod();
 
-        if (array_key_exists($method,static::MAP_METHOD) === false) {
+        if (array_key_exists($method, $this->methodsMap) === false) {
             throw new Exception('This transfer method is not encrypted');
         }
 
-        $this->handler = static::MAP_METHOD[$method];
+        $this->handler = $this->methodsMap[$method];
     }
 }

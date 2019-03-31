@@ -11,21 +11,22 @@ class Task {
 
     /**
      * @param int $userId
-     * @param string $data
-     * @return mixed
+     * @param array $data
+     * @return int
      * @throws Exception
      */
-    public function saveTask(int $userId, string $data)
+    public function saveTask(int $userId, array $data): int
     {
         $task = R::dispense(static::TABLE_NAME);
         $task->user_id = $userId;
-        $task->task = $data;
+        $task->task_name = $data['task'];
+        $task->task = json_encode($data['params']);
 
         if (!R::store($task)) {
             throw new Exception('Error creating task');
         }
 
-        return R::getInsertID();
+        return (int) R::getInsertID();
     }
 
     /**
@@ -49,13 +50,12 @@ class Task {
      * @param int $taskId
      * @return string
      */
-    public function getTaskResults(int $taskId): string
+    public function getTask(int $taskId)
     {
-        return R::getCell("
-              SELECT r.result 
-              FROM " . static::TABLE_NAME . " AS t
-              JOIN task_results AS r ON t.id = r.task_id
-              WHERE t.id = :id",
+        return R::getAll("
+              SELECT task_name, task
+              FROM " . static::TABLE_NAME . "
+              WHERE id = :id",
             [':id' => $taskId]
         );
     }

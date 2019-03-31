@@ -21,9 +21,7 @@ if (empty($_GET['route'])) {
 
 try {
     $values = file_get_contents('php://input');
-    $request = new HandlerRequest($_GET['route'], $values);
-    $response = new HandlerResponse($request->getHandler());
-    echo $response->get();
+    (new HandlerRequest($_GET['route'], $values));
 } catch (Exception $e) {
     echo $e->getMessage();
 }

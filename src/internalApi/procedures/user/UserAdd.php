@@ -39,7 +39,7 @@ class UserAdd implements IUser
      */
     public function get(int $userId): array
     {
-        $userCreateId = $this->serService()->createUserTransaction($this->params);
+        $userCreateId = $this->userService->createUserTransaction($this->params);
         
         return (new User)->get($userCreateId)[0];
     }

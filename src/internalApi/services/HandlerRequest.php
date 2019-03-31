@@ -20,6 +20,11 @@ class HandlerRequest implements IHandlerRequest
     private $procedure;
 
     /**
+     * @var IResponseProcedures
+     */
+    private $respose;
+
+    /**
      * @var int
      */
     private $id;
@@ -39,14 +44,15 @@ class HandlerRequest implements IHandlerRequest
     {
         $this->processingRequest($page);
         $this->params = $params;
+        $this->getHandler();
     }
 
     /**
-     * @return IResponseProcedures
+     * @return IHandlerRequest
      */
-    public function getHandler(): IResponseProcedures
+    private function getHandler()
     {
-        return new $this->procedure($this->id, $this->params);
+        (new $this->procedure($this->id, $this->params))->get();
     }
 
     /**

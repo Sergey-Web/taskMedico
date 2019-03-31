@@ -41,16 +41,13 @@ class UserService
             $user = R::dispense('users');
             $user->email = $params['email'];
             $user->password = password_hash($params['password'], PASSWORD_BCRYPT);
-            $user->created_at = (new DateTime())->format('Y-m-d h:i:s');
             R::store($user);
             $userId = R::getInsertID();
 
-            if (!empty($params['access'])) {
-                $access = R::dispense('accesses');
-                $access->user_id = $userId;
-                $access->access = $params['access'];
-                R::store($access);
-            }
+            $access = R::dispense('accesses');
+            $access->user_id = $userId;
+            $access->access = !empty($params['access']) ? $params['access'] : 1;
+            R::store($access);
 
             if (!empty($params['name'])) {
                 $name = R::dispense('names');
@@ -105,17 +102,19 @@ class UserService
             }
 
             if (!empty($params['name'])) {
-                $name = R::load('names', $userId);
-                $name->user_id = $userId;
-                $name->name = $params['name'];
-                R::store($name);
+                R::exec("
+                  INSERT INTO names (user_id, name) 
+                  VALUES ({$userId}, '{$params['name']}')
+                  ON DUPLICATE KEY UPDATE name = '{$params['name']}'
+               ");
             }
 
             if (!empty($params['phone'])) {
-                $phone = R::load('phones', $userId);
-                $phone->user_id = $userId;
-                $phone->phone = $params['phone'];
-                R::store($phone);
+                R::exec("
+                  INSERT INTO phones (user_id, phone) 
+                  VALUES ({$userId}, '{$params['phone']}')
+                  ON DUPLICATE KEY UPDATE user_id = {$userId}, phone = '{$params['phone']}'
+               ");
             }
 
             $user->updated_at = (new DateTime())->format('Y-m-d h:i:s');
@@ -135,6 +134,10 @@ class UserService
         $token = (new HttpService)->getHeaderAuthToken();
         $userAccess = (new Access)->getAccessUserByToken($token);
 
+        if (empty($this->accesses[$userAccess])) {
+            throw new Exception('You do not have access', 403);
+        }
+
         if ($this->accesses[$userAccess] !== 'admin') {
             throw new Exception('You do not have access', 403);
         }
@@ -150,8 +153,7 @@ class UserService
             || !empty($params['password'])
             || !empty($params['name'])
             || !empty($params['access'])
-            || !empty($params['phone']))
-        {
+            || !empty($params['phone'])) {
             return;
         }
 

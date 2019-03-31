@@ -2,13 +2,18 @@
 
 namespace app\internalApi\models;
 
-use app\internalApi\exceptions\{TokenCreateErrorExceptions,TokenUpdateErrorExceptions};
+use app\internalApi\exceptions\{TokenCreateErrorExceptions, TokenUpdateErrorExceptions};
 use \RedBeanPHP\R as R;
 
-class Token {
+class Token
+{
 
     const TABLE_NAME = 'tokens';
 
+    /**
+     * @param string $userToken
+     * @return string
+     */
     public function getUserIdByToken(string $userToken): string
     {
         return R::getCell("
@@ -37,7 +42,7 @@ class Token {
     {
         return R::getAll("
             SELECT token
-            FROM ".self::TABLE_NAME."
+            FROM " . self::TABLE_NAME . "
             WHERE user_id = :user_id",
             [':user_id' => $userId]
         );
@@ -70,14 +75,11 @@ class Token {
      */
     public function updateToken(int $userId, string $token): string
     {
-        $tokenUpdate = R::exec( "
-                          UPDATE " . static::TABLE_NAME . "  
-                          SET token = '{$token}', date = NOW() 
-                          WHERE user_id = :user_id",
-                            [
-                                ':user_id' => $userId
-                            ]
-                        );
+        $tokenUpdate = R::exec("
+          INSERT INTO " . static::TABLE_NAME . "(user_id, token, date) 
+          VALUES ({$userId}, '{$token}', NOW())
+          ON DUPLICATE KEY UPDATE token = '{$token}' date = NOW()
+       ");
 
         if (!$tokenUpdate) {
             throw new TokenUpdateErrorExceptions();
@@ -88,23 +90,16 @@ class Token {
 
     /**
      * @param int $userId
-     * @return bool
      * @throws TokenUpdateErrorExceptions
      */
-    public function updateDate(int $userId): bool
+    public function updateDate(int $userId)
     {
-        $tokenUpdate = R::exec( "
-                          UPDATE " . static::TABLE_NAME . "  
-                          SET date = NOW() WHERE user_id = :user_id",
-                            [
-                                'user_id' => $userId
-                            ]
-                        );
-
-        if (!$tokenUpdate) {
-            throw new TokenUpdateErrorExceptions();
-        }
-
-        return $tokenUpdate;
+        $tokenUpdate = R::exec("
+          UPDATE " . static::TABLE_NAME . "  
+          SET date = NOW() WHERE user_id = :user_id",
+            [
+                'user_id' => $userId
+            ]
+        );
     }
 }

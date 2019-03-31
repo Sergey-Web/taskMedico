@@ -49,7 +49,8 @@ CREATE TABLE `tasks`
 (
   `id`         INT(11) AUTO_INCREMENT,
   `user_id`    INT(11)     NOT NULL,
-  `task`       VARCHAR(20) NOT NULL,
+  `task_name`  VARCHAR(20) NOT NULL,
+  `task`       VARCHAR(50) NOT NULL,
   `created_at` TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`user_id`) REFERENCES users (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -65,6 +66,12 @@ CREATE TABLE `task_results`
   FOREIGN KEY (`task_id`) REFERENCES tasks (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB;
 
+ALTER TABLE `phones`
+  ADD CONSTRAINT uc_user_id_phone UNIQUE (user_id, phone);
+ALTER TABLE `names`
+  ADD UNIQUE (user_id);
+ALTER TABLE `tokens`
+  ADD UNIQUE (user_id);
 # Для успешной аунтентификации нужно поиск будет по email
 CREATE INDEX users_email_pass ON users (email);
 # При проверки прав пользователей проверка будет по полю access

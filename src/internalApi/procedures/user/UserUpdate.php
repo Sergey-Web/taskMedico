@@ -39,7 +39,7 @@ class UserUpdate implements IUser
      */
     public function get(int $userId): array
     {
-        $userId = (new TokenService())->getUserIdByAuthToken();
+        (new TokenService())->getUserIdByAuthToken();
         $this->userService->updateUserTransaction($userId, $this->params);
 
         return (new User)->get($userId)[0];

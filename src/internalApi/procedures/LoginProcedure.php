@@ -28,11 +28,16 @@ class LoginProcedure implements IResponseProcedures
         $this->params = $params;
     }
 
+    public function get()
+    {
+        echo json_encode(['result' => $this->handler()]);
+    }
+
     /**
      * @return string
      * @throws TokenUpdateErrorExceptions
      */
-    public function get(): string
+    public function handler(): string
     {
         $userId = (new LoginService())->checkUser($this->params);
 

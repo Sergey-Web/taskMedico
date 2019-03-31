@@ -25,7 +25,6 @@ class HttpService
      */
     public function checkMethodHttp(string $method)
     {
-        $this->getHeaderAuthToken();
         if ($_SERVER['REQUEST_METHOD'] !== $method) {
             throw new Exception('Data Transfer Method Error', 401);
         }
