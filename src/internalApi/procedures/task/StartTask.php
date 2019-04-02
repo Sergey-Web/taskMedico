@@ -3,6 +3,7 @@
 namespace app\internalApi\procedures\task;
 
 use app\internalApi\models\Task;
+use app\internalApi\services\HttpService;
 use app\internalApi\services\TokenService;
 use Exception;
 
@@ -72,14 +73,14 @@ class StartTask implements IHandlerTask
     private function processingData(int $taskId)
     {
         $data = json_encode(['taskId' => $taskId]);
-        $header = ['X-HTTP-Method-Override: PUT', 'Content-Type: application/json', 'Authorization: 48530017-15b3-406f-8fd4-f64788b4c56e'];
+        $header = ['X-HTTP-Method-Override: PUT', 'Content-Type: application/json', 'Authorization:'. (new HttpService())->getHeaderAuthToken()];
         $ch = curl_init($_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . '/api/task/');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 1);
-        curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
+//        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 1);
+//        curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
         curl_exec($ch);
         curl_close($ch);
     }
