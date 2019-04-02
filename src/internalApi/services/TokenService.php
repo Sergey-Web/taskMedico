@@ -16,6 +16,11 @@ class TokenService
     {
         $authToken = (new HttpService())->getHeaderAuthToken();
         $tokenDateCreate = (new Token())->getDateToken($authToken);
+
+        if (empty($tokenDateCreate)) {
+            throw new Exception('Invalid token', 403);
+        }
+
         $tokenData = (new DateTime($tokenDateCreate));
         $curDate = (new DateTime());
         $dateDiff = $curDate->getTimestamp() - $tokenData->getTimestamp();

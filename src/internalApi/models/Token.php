@@ -24,7 +24,7 @@ class Token
         );
     }
 
-    public function getDateToken(string $token): string
+    public function getDateToken(string $token)
     {
         return R::getCell("
               SELECT date
