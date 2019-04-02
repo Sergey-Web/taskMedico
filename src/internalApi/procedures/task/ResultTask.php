@@ -2,7 +2,6 @@
 
 namespace app\internalApi\procedures\task;
 
-use app\internalApi\models\Task;
 use app\internalApi\models\TaskResult;
 
 class ResultTask implements IHandlerTask
@@ -20,7 +19,7 @@ class ResultTask implements IHandlerTask
     public function get(int $taskId)
     {
         $this->taskId = $taskId;
-        echo json_encode($this->handler());
+        echo json_encode($this->handler(), JSON_UNESCAPED_UNICODE);
     }
 
     /**
@@ -32,7 +31,7 @@ class ResultTask implements IHandlerTask
         $resultTask = $this->getResultTask();
 
         if (!empty($resultTask)) {
-            $result = ['status' => 'done', 'result' => $resultTask];
+            $result = ['status' => 'done', 'result' => json_decode($resultTask)];
         }
 
         return $result;

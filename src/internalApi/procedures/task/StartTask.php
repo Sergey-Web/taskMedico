@@ -3,7 +3,6 @@
 namespace app\internalApi\procedures\task;
 
 use app\internalApi\models\Task;
-use app\internalApi\models\Token;
 use app\internalApi\services\TokenService;
 use Exception;
 

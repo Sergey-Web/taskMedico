@@ -31,23 +31,6 @@ class Task {
 
     /**
      * @param int $taskId
-     * @param string $data
-     * @throws Exception
-     */
-    public function saveResult(int $taskId, string $data)
-    {
-        $task = R::exec("
-            INSERT INTO task_results (task_id, result)
-            VALUES ({$taskId}, '" . $data . "')
-        ");
-
-        if (!$task) {
-            throw new Exception('Error creating task results');
-        }
-    }
-
-    /**
-     * @param int $taskId
      * @return string
      */
     public function getTask(int $taskId)

@@ -2,11 +2,16 @@
 
 namespace app\internalApi\procedures\task;
 
-use app\internalApi\models\Task;
+use app\internalApi\models\{TaskResult, Task};
+use app\internalApi\procedures\task\handlersTask\{Fibonacci, Sleep, ConverterMoneyString};
 use Exception;
 
 class ProcessingTask implements IHandlerTask
 {
+    /**
+     * @var TaskResult
+     */
+    private $taskResult;
 
     /**
      * @var Task
@@ -32,7 +37,7 @@ class ProcessingTask implements IHandlerTask
      * @var array
      */
     private $mapTask = [
-//        'convertMoneyString' => ConverterMoneyString::class,
+        'convertMoneyString' => ConverterMoneyString::class,
         'fibonacci' => Fibonacci::class,
         'sleep' => Sleep::class
     ];
@@ -46,11 +51,12 @@ class ProcessingTask implements IHandlerTask
     {
         $params = json_decode($params, true);
         $this->checkParams($params);
-        $this->task = new Task;
+        $this->task = new Task();
+        $this->taskResult = new TaskResult();
         $this->taskId = $params['taskId'];
         $getDataTask = $this->task->getTask($params['taskId'])[0];
         $this->taskName = $getDataTask['task_name'];
-        $this->params = json_decode($getDataTask['task']);
+        $this->params = json_decode($getDataTask['task'], true);
     }
 
     /**
@@ -59,18 +65,18 @@ class ProcessingTask implements IHandlerTask
      */
     public function get(int $taskId)
     {
-        $this->task->saveResult(
+        $this->taskResult->saveResult(
             $this->taskId,
-            json_encode($this->processingTask())
+            json_encode($this->processingTask(), JSON_UNESCAPED_UNICODE)
         );
     }
 
     /**
      * @return array
      */
-    public function processingTask(): array
+    public function processingTask()
     {
-        return (new $this->mapTask[$this->taskName])->result($this->params);
+        return (new $this->mapTask[$this->taskName]($this->params))->result();
     }
 
     /**
