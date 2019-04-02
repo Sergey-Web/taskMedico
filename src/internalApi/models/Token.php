@@ -78,7 +78,7 @@ class Token
         $tokenUpdate = R::exec("
           INSERT INTO " . static::TABLE_NAME . "(user_id, token, date) 
           VALUES ({$userId}, '{$token}', NOW())
-          ON DUPLICATE KEY UPDATE token = '{$token}' date = NOW()
+          ON DUPLICATE KEY UPDATE token = '{$token}'
        ");
 
         if (!$tokenUpdate) {
