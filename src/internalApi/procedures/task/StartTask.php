@@ -79,8 +79,8 @@ class StartTask implements IHandlerTask
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-//        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 1);
-//        curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
+        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 1);
+        curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
         curl_exec($ch);
         curl_close($ch);
     }
